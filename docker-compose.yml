@@ -1,0 +1,56 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:11
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=resume_database
+
+  api:
+    build: .
+    container_name: api
+    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - static:/code/static
+      - .:/codes
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    expose:
+      - 8000
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.nginx
+    container_name: nginx
+    volumes:
+      - static:/code/static
+    ports:
+      - "88:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_volume:
+  static:

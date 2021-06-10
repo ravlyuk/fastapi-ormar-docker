@@ -1,0 +1,11 @@
+docker-compose run api alembic revision -m "migration1" --autogenerate
+
+docker-compose run api alembic upgrade head
+
+docker-compose up --build --remove-orphans
+
+kill all containers:
+sudo docker rm --force $(docker ps -a -q)
+
+kill port:
+sudo fuser -k 5432/tcp

@@ -20,7 +20,7 @@ services:
     command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - static:/code/static
-      - .:/codes
+      - .:/code
     ports:
       - "8000:8000"
     depends_on:
@@ -47,7 +47,7 @@ services:
     volumes:
       - static:/code/static
     ports:
-      - "88:80"
+      - "80:80"
     depends_on:
       - api
 

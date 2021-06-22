@@ -22,3 +22,4 @@ fastapi_users = FastAPIUsers(
 )
 
 current_active_user = fastapi_users.current_user(active=True)
+

@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from database.db import database
-from resume.api import resume_router
+from resume.api import resume_router, test_router
 from user.routers import user_router
 
 app = FastAPI(title="Resume API", description="Simple api for load resume", version="0.1.0")
@@ -26,6 +26,7 @@ async def shutdown() -> None:
         await database_.disconnect()
 
 
+app.include_router(test_router)
 app.include_router(user_router)
 app.include_router(resume_router)
 

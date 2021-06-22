@@ -4,10 +4,12 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends
 from starlette.responses import HTMLResponse
 from starlette.templating import Jinja2Templates
 
-from user.auth import current_active_user
 from . import models, schemas, services
+from user import role, auth
 
 resume_router = APIRouter(tags=['resume'])
+test_router = APIRouter(tags=['test permission'])
+
 templates = Jinja2Templates(directory="templates")
 
 
@@ -16,7 +18,7 @@ async def create_resume(
         title: str = Form(...),
         description: str = Form(...),
         file: UploadFile = File(...),
-        user: models.User = Depends(current_active_user)
+        user: models.User = Depends(auth.current_active_user)
 ):
     return await services.save_resume(user, file, title, description)
 
@@ -33,3 +35,18 @@ async def get_resume(request: Request):
     return templates.TemplateResponse("resumes.html", {"request": request, "resumes": resumes})
 
 
+# -----------------
+
+@test_router.get("/user/member_admin", dependencies=[Depends(role.member_admin)])
+async def member_admin():
+    return 'Member and Admin - success!'
+
+
+@test_router.get("/user/admin", dependencies=[Depends(role.admin)])
+async def admin():
+    return 'Admin - success!'
+
+
+@test_router.get("/user/member", dependencies=[Depends(role.member)])
+async def member():
+    return 'Member - success!'
